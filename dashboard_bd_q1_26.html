@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BD Dashboard — TikTok LIVE Brasil Q1'26</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--surface3:#22223a;--accent:#fe2c55;--accent2:#25f4ee;--accent3:#fffc00;--accent4:#ff6b35;--text:#e8e8ee;--text2:#8888a0;--text3:#555570;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--border:#2a2a3e}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.noise{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:.03;z-index:999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.glow-orb.pink{width:400px;height:400px;background:var(--accent);opacity:.06;top:-100px;right:-100px}
+.glow-orb.cyan{width:350px;height:350px;background:var(--accent2);opacity:.05;bottom:10%;left:-80px}
+.container{max-width:1440px;margin:0 auto;padding:24px;position:relative;z-index:1}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px}
+.header-left{display:flex;align-items:center;gap:16px}
+.logo{width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;box-shadow:0 0 30px rgba(254,44,85,.3)}
+.header h1{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.header h1 span{color:var(--accent)}
+.header .subtitle{font-size:13px;color:var(--text2);font-family:'Space Mono',monospace}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--accent2);font-family:'Space Mono',monospace}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}
+.kpi:hover{transform:translateY(-2px);border-color:var(--accent)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .2s}
+.kpi:hover::before{opacity:1}
+.kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;font-family:'Space Mono',monospace}
+.kpi-value{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1}
+.kpi-sub{font-size:12px;color:var(--text3);margin-top:6px}
+.section{margin-bottom:32px}
+.section-title{font-size:14px;text-transform:uppercase;letter-spacing:2px;color:var(--text2);margin-bottom:16px;font-family:'Space Mono',monospace;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:12px;height:2px;background:var(--accent)}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.charts-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:32px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.goal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
+.goal-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center}
+.goal-card h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:12px;font-family:'Space Mono',monospace}
+.goal-ring{width:120px;height:120px;margin:0 auto 12px;position:relative}
+.goal-ring svg{transform:rotate(-90deg)}
+.goal-ring .value{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;font-weight:700}
+.operator-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.op-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px}
+.op-card .op-header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.op-card .avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff}
+.op-card .op-name{font-weight:600;font-size:16px}
+.op-card .op-role{font-size:11px;color:var(--text2)}
+.op-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.op-stat{text-align:center;padding:12px 0;background:var(--surface2);border-radius:10px}
+.op-stat .val{font-size:22px;font-weight:700}
+.op-stat .lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text2);font-family:'Space Mono',monospace;margin-top:2px}
+.op-goal{margin-top:12px;padding:16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border)}
+.op-goal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.op-goal-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text2);font-family:'Space Mono',monospace}
+.op-goal-value{font-size:18px;font-weight:700}
+.op-goal-bar{height:10px;border-radius:5px;background:var(--surface3);overflow:hidden}
+.op-goal-bar .fill{height:100%;border-radius:5px;transition:width .6s ease}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.table-controls{padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);align-items:center}
+.tab{padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;font-family:'DM Sans',sans-serif}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab:hover:not(.active){border-color:var(--text3)}
+.search-box{margin-left:auto;padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:200px}
+.search-box::placeholder{color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{position:sticky;top:0;z-index:2}
+th{padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text2);background:var(--surface2);font-family:'Space Mono',monospace;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--accent2)}
+td{padding:10px 14px;border-top:1px solid var(--border);white-space:nowrap}
+tr:hover td{background:rgba(254,44,85,.03)}
+.table-scroll{max-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--text3) transparent}
+.table-scroll::-webkit-scrollbar{width:4px}
+.table-scroll::-webkit-scrollbar-thumb{background:var(--text3);border-radius:4px}
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.status-pill.graduated{background:rgba(34,197,94,.12);color:var(--green)}
+.status-pill.partial{background:rgba(245,158,11,.12);color:var(--amber)}
+.status-pill.miss{background:rgba(239,68,68,.12);color:var(--red)}
+.status-pill.new{background:rgba(37,244,238,.12);color:var(--accent2)}
+.bar-mini{height:6px;border-radius:3px;background:var(--surface3);overflow:hidden;min-width:60px}
+.bar-mini .fill{height:100%;border-radius:3px;transition:width .5s ease}
+.profile-tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.5px}
+@media(max-width:900px){.charts-row,.goal-grid,.charts-row-3,.operator-grid{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.kpi-grid{grid-template-columns:1fr}.header{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="glow-orb pink"></div>
+<div class="glow-orb cyan"></div>
+<div class="container" id="app"></div>
+<script>
+const DATA=[{"name":"FUTURIS AGENCY LTDA","reg_date":"2026-01-05","operator":"isabella.baroli","creators_14":14,"rev_14":196219,"creators_30":39,"rev_30":742214,"profile":"Streamer/CFA","origem":"Indicação","estado":"N/A"},{"name":"Star Trend Agency","reg_date":"2026-01-05","operator":"isabella.baroli","creators_14":24,"rev_14":87562,"creators_30":59,"rev_30":333337,"profile":"Streamer/CFA","origem":"TikTok Ads","estado":"N/A"},{"name":"INOVACAO FLY LTDA","reg_date":"2026-01-06","operator":"isabella.baroli","creators_14":5,"rev_14":28908,"creators_30":34,"rev_30":108552,"profile":"Streamer/CFA","origem":"Indicação","estado":"N/A"},{"name":"Royal Agency Oficial","reg_date":"2026-01-07","operator":"kauan.viana","creators_14":8,"rev_14":33626,"creators_30":17,"rev_30":77598,"profile":"Ex-Subagência","origem":"Indicação","estado":"N/A"},{"name":"Konecta Lives","reg_date":"2026-01-07","operator":"isabella.baroli","creators_14":4,"rev_14":10305,"creators_30":6,"rev_30":10392,"profile":"Streamer/CFA","origem":"Indicação","estado":"N/A"},{"name":"Recuperagram LTDA","reg_date":"2026-01-07","operator":"isabella.baroli","creators_14":1,"rev_14":0,"creators_30":1,"rev_30":0,"profile":"Outras Plataformas","origem":"TikTok Ads","estado":"MG"},{"name":"TWO LIVE AGENCY","reg_date":"2026-01-08","operator":"isabella.baroli","creators_14":7,"rev_14":9309,"creators_30":16,"rev_30":46229,"profile":"Streamer/CFA","origem":"N/A","estado":"N/A"},{"name":"Doug Hits Produtora","reg_date":"2026-01-08","operator":"kauan.viana","creators_14":28,"rev_14":83758,"creators_30":38,"rev_30":229480,"profile":"Sem Experiência","origem":"Indicação","estado":"N/A"},{"name":"Neon Agency","reg_date":"2026-01-08","operator":"kauan.viana","creators_14":8,"rev_14":258,"creators_30":33,"rev_30":5341,"profile":"Sem Experiência","origem":"Indicação","estado":"RJ"},{"name":"Creator Hub Brasil","reg_date":"2026-01-08","operator":"kauan.viana","creators_14":5,"rev_14":8772,"creators_30":6,"rev_30":10429,"profile":"Ex-Subagência","origem":"Indicação","estado":"N/A"},{"name":"Blumhouse","reg_date":"2026-01-08","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"TikTok Ads","estado":"SP"},{"name":"Agencia Vivire","reg_date":"2026-01-08","operator":"isabella.baroli","creators_14":1,"rev_14":0,"creators_30":2,"rev_30":0,"profile":"Sem Experiência","origem":"N/A","estado":"SP"},{"name":"ORIUN AGENCY","reg_date":"2026-01-08","operator":"isabella.baroli","creators_14":20,"rev_14":188969,"creators_30":46,"rev_30":733667,"profile":"Streamer/CFA","origem":"TikTok Ads","estado":"SP"},{"name":"PRIMEROSE BRAZIL+","reg_date":"2026-01-08","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"N/A","origem":"N/A","estado":"N/A"},{"name":"Agencia Sete","reg_date":"2026-01-11","operator":"isabella.baroli","creators_14":7,"rev_14":123,"creators_30":20,"rev_30":10881,"profile":"Outras Plataformas","origem":"N/A","estado":"RJ"},{"name":"AVENZI AGENCY","reg_date":"2026-01-13","operator":"kauan.viana","creators_14":4,"rev_14":1233,"creators_30":20,"rev_30":8110,"profile":"Outras Plataformas","origem":"Indicação","estado":"ES"},{"name":"Agencia Ekeko","reg_date":"2026-01-13","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Sem Experiência","origem":"TikTok Ads","estado":"SP"},{"name":"UpLive Creators Network","reg_date":"2026-01-14","operator":"isabella.baroli","creators_14":12,"rev_14":162117,"creators_30":32,"rev_30":625076,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Estrela","reg_date":"2026-01-15","operator":"isabella.baroli","creators_14":20,"rev_14":49050,"creators_30":36,"rev_30":294260,"profile":"Streamer/CFA","origem":"N/A","estado":"RS"},{"name":"Enigm3","reg_date":"2026-01-15","operator":"isabella.baroli","creators_14":2,"rev_14":0,"creators_30":2,"rev_30":4,"profile":"Sem Experiência","origem":"N/A","estado":"DF"},{"name":"Assistecgamer","reg_date":"2026-01-15","operator":"kauan.viana","creators_14":4,"rev_14":19648,"creators_30":9,"rev_30":99172,"profile":"Streamer/CFA","origem":"N/A","estado":"GO"},{"name":"Grupo SA","reg_date":"2026-01-18","operator":"isabella.baroli","creators_14":19,"rev_14":5704,"creators_30":34,"rev_30":53104,"profile":"Outras Plataformas","origem":"N/A","estado":"ES"},{"name":"Agencia quebra tudo","reg_date":"2026-01-18","operator":"kauan.viana","creators_14":3,"rev_14":2,"creators_30":3,"rev_30":389,"profile":"Outras Plataformas","origem":"N/A","estado":"RJ"},{"name":"Star House","reg_date":"2026-01-19","operator":"kauan.viana","creators_14":3,"rev_14":4,"creators_30":3,"rev_30":7,"profile":"Outras Plataformas","origem":"N/A","estado":"ES"},{"name":"Ascend Creators","reg_date":"2026-01-19","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"N/A","estado":"GO"},{"name":"UpScale Lab","reg_date":"2026-01-19","operator":"isabella.baroli","creators_14":1,"rev_14":6,"creators_30":5,"rev_30":467,"profile":"Sem Experiência","origem":"N/A","estado":"MG"},{"name":"Alpha Live","reg_date":"2026-01-19","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Sem Experiência","origem":"N/A","estado":"PR"},{"name":"Creator Up Agency","reg_date":"2026-01-19","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":1,"rev_30":1,"profile":"GFA (Presenteador)","origem":"N/A","estado":"MA"},{"name":"agencia onca ferrary stream","reg_date":"2026-01-19","operator":"kauan.viana","creators_14":26,"rev_14":188026,"creators_30":67,"rev_30":791455,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"AGENCIA BRAZUCA","reg_date":"2026-01-19","operator":"kauan.viana","creators_14":1,"rev_14":28,"creators_30":9,"rev_30":49938,"profile":"Ex-Subagência","origem":"N/A","estado":"SE"},{"name":"Dudda Live Creators","reg_date":"2026-01-19","operator":"isabella.baroli","creators_14":25,"rev_14":542,"creators_30":55,"rev_30":20704,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Lumyna","reg_date":"2026-01-20","operator":"kauan.viana","creators_14":1,"rev_14":0,"creators_30":3,"rev_30":117,"profile":"Ex-Subagência","origem":"N/A","estado":"DF"},{"name":"GIS Agency","reg_date":"2026-01-21","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"GFA (Presenteador)","origem":"N/A","estado":"SP"},{"name":"castlelive","reg_date":"2026-01-22","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":11,"rev_30":18737,"profile":"Streamer/CFA","origem":"N/A","estado":"RS"},{"name":"Agencia crIAdores","reg_date":"2026-01-22","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"N/A","estado":"PR"},{"name":"SertaoProLive","reg_date":"2026-01-23","operator":"kauan.viana","creators_14":7,"rev_14":3617,"creators_30":10,"rev_30":10337,"profile":"Streamer/CFA","origem":"N/A","estado":"BA"},{"name":"Digital Office","reg_date":"2026-01-26","operator":"kauan.viana","creators_14":10,"rev_14":126257,"creators_30":14,"rev_30":138566,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Agencia Gold","reg_date":"2026-01-26","operator":"kauan.viana","creators_14":5,"rev_14":12486,"creators_30":12,"rev_30":40427,"profile":"GFA (Presenteador)","origem":"N/A","estado":"MG"},{"name":"BUSY INFLUENCERS","reg_date":"2026-01-26","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Sem Experiência","origem":"TikTok Ads","estado":"N/A"},{"name":"Grupo Conecta LTDA","reg_date":"2026-01-26","operator":"isabella.baroli","creators_14":16,"rev_14":23641,"creators_30":28,"rev_30":136213,"profile":"Ex-Subagência","origem":"N/A","estado":"RS"},{"name":"Grupo HUB","reg_date":"2026-01-26","operator":"kauan.viana","creators_14":23,"rev_14":1845,"creators_30":29,"rev_30":3923,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"Falcão Digital","reg_date":"2026-01-28","operator":"isabella.baroli","creators_14":25,"rev_14":138040,"creators_30":42,"rev_30":413567,"profile":"Streamer/CFA","origem":"N/A","estado":"AL"},{"name":"Pink Mind Agency","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":7,"rev_14":24160,"creators_30":8,"rev_30":31786,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Brazil Cash","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"N/A","estado":"RJ"},{"name":"Furacao","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":11,"rev_14":19097,"creators_30":17,"rev_30":174672,"profile":"Outras Plataformas","origem":"TikTok Ads","estado":"MG"},{"name":"JF Growth","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":17,"rev_14":42229,"creators_30":41,"rev_30":183988,"profile":"GFA (Presenteador)","origem":"TikTok Ads","estado":"ES"},{"name":"Bones Agency","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":10,"rev_14":21886,"creators_30":13,"rev_30":67834,"profile":"GFA (Presenteador)","origem":"N/A","estado":"SP"},{"name":"STUDIO SEVEN","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":2,"rev_14":951,"creators_30":2,"rev_30":3135,"profile":"GFA (Presenteador)","origem":"N/A","estado":"SP"},{"name":"DMaior Agency","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":1,"rev_14":104,"creators_30":1,"rev_30":892,"profile":"Outras Plataformas","origem":"N/A","estado":"MG"},{"name":"Hype Gaming","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":11,"rev_14":24516,"creators_30":15,"rev_30":34630,"profile":"Streamer/CFA","origem":"N/A","estado":"N/A"},{"name":"vibemusicagency","reg_date":"2026-01-29","operator":"isabella.baroli","creators_14":2,"rev_14":250,"creators_30":2,"rev_30":271,"profile":"Streamer/CFA","origem":"TikTok Ads","estado":"RS"},{"name":"Nast ag.","reg_date":"2026-01-30","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"TikTok Ads","estado":"PR"},{"name":"New Life Agency","reg_date":"2026-01-30","operator":"isabella.baroli","creators_14":2,"rev_14":23,"creators_30":2,"rev_30":23,"profile":"Streamer/CFA","origem":"N/A","estado":"AM"},{"name":"COLIBRIS DIGITAL","reg_date":"2026-01-30","operator":"isabella.baroli","creators_14":8,"rev_14":1728,"creators_30":8,"rev_30":1735,"profile":"Outras Plataformas","origem":"N/A","estado":"N/A"},{"name":"Sync Creators","reg_date":"2026-02-02","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Sem Experiência","origem":"Webinar","estado":"SP"},{"name":"live.com","reg_date":"2026-02-04","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":1,"rev_30":0,"profile":"N/A","origem":"N/A","estado":"N/A"},{"name":"LOUD5","reg_date":"2026-02-05","operator":"kauan.viana","creators_14":1,"rev_14":2740,"creators_30":1,"rev_30":5936,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"coletivaevolucao","reg_date":"2026-02-05","operator":"kauan.viana","creators_14":8,"rev_14":1834,"creators_30":16,"rev_30":3219,"profile":"Ex-Subagência","origem":"TikTok Ads","estado":"MG"},{"name":"Virada de chave","reg_date":"2026-02-05","operator":"isabella.baroli","creators_14":14,"rev_14":27139,"creators_30":44,"rev_30":206849,"profile":"Streamer/CFA","origem":"N/A","estado":"MS"},{"name":"Universy Agency","reg_date":"2026-02-05","operator":"kauan.viana","creators_14":34,"rev_14":133897,"creators_30":80,"rev_30":755296,"profile":"Ex-Subagência","origem":"N/A","estado":"RS"},{"name":"Agencia Meteoro","reg_date":"2026-02-05","operator":"kauan.viana","creators_14":8,"rev_14":7910,"creators_30":16,"rev_30":45538,"profile":"Ex-Subagência","origem":"N/A","estado":"RS"},{"name":"Vida Nexa Oficial","reg_date":"2026-02-06","operator":"kauan.viana","creators_14":5,"rev_14":11187,"creators_30":14,"rev_30":56012,"profile":"GFA (Presenteador)","origem":"N/A","estado":"MG"},{"name":"POWER INFLUENCER","reg_date":"2026-02-09","operator":"kauan.viana","creators_14":5,"rev_14":52,"creators_30":32,"rev_30":13109,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"Potencialize Midias","reg_date":"2026-02-09","operator":"kauan.viana","creators_14":7,"rev_14":1875,"creators_30":8,"rev_30":14081,"profile":"Outras Plataformas","origem":"TikTok Ads","estado":"RS"},{"name":"DkS AGENCY","reg_date":"2026-02-09","operator":"kauan.viana","creators_14":30,"rev_14":200115,"creators_30":47,"rev_30":388149,"profile":"Streamer/CFA","origem":"N/A","estado":"SC"},{"name":"GV COMPANY","reg_date":"2026-02-10","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"TikTok Ads","estado":"PR"},{"name":"Agencia Vita","reg_date":"2026-02-12","operator":"kauan.viana","creators_14":28,"rev_14":56855,"creators_30":67,"rev_30":453382,"profile":"Ex-Subagência","origem":"N/A","estado":"RJ"},{"name":"Martins Live Pro","reg_date":"2026-02-12","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Sem Experiência","origem":"N/A","estado":"MG"},{"name":"Gold Agecy","reg_date":"2026-02-12","operator":"isabella.baroli","creators_14":13,"rev_14":21096,"creators_30":17,"rev_30":57684,"profile":"Streamer/CFA","origem":"TikTok Ads","estado":"SP"},{"name":"SKIT Comunicacao","reg_date":"2026-02-12","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":9,"rev_30":324,"profile":"Sem Experiência","origem":"N/A","estado":"SP"},{"name":"Myhome","reg_date":"2026-02-12","operator":"isabella.baroli","creators_14":1,"rev_14":0,"creators_30":2,"rev_30":4364,"profile":"Streamer/CFA","origem":"N/A","estado":"RJ"},{"name":"LIS.STREAM.AGENC","reg_date":"2026-02-12","operator":"kauan.viana","creators_14":27,"rev_14":10126,"creators_30":35,"rev_30":44654,"profile":"Streamer/CFA","origem":"N/A","estado":"RS"},{"name":"Pactual agencia","reg_date":"2026-02-12","operator":"isabella.baroli","creators_14":17,"rev_14":32546,"creators_30":25,"rev_30":156331,"profile":"Streamer/CFA","origem":"N/A","estado":"N/A"},{"name":"Lumio Agency","reg_date":"2026-02-15","operator":"isabella.baroli","creators_14":6,"rev_14":15283,"creators_30":46,"rev_30":173666,"profile":"Ex-Subagência","origem":"N/A","estado":"PR"},{"name":"GRUPO GUINNESS","reg_date":"2026-02-15","operator":"isabella.baroli","creators_14":7,"rev_14":161,"creators_30":20,"rev_30":18208,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"GAME OVER FRSA","reg_date":"2026-02-16","operator":"isabella.baroli","creators_14":31,"rev_14":589000,"creators_30":36,"rev_30":1166074,"profile":"Streamer/CFA","origem":"N/A","estado":"SE"},{"name":"Inefavel Agency","reg_date":"2026-02-19","operator":"kauan.viana","creators_14":6,"rev_14":6373,"creators_30":7,"rev_30":15365,"profile":"Streamer/CFA","origem":"N/A","estado":"BA"},{"name":"Fenic Agency","reg_date":"2026-02-20","operator":"kauan.viana","creators_14":1,"rev_14":57,"creators_30":1,"rev_30":57,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Agencia BMB","reg_date":"2026-02-22","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"LIVE BOOST","reg_date":"2026-02-22","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outro Negócio","origem":"N/A","estado":"MG"},{"name":"Elite Creator's","reg_date":"2026-02-22","operator":"kauan.viana","creators_14":4,"rev_14":24380,"creators_30":7,"rev_30":128309,"profile":"GFA (Presenteador)","origem":"N/A","estado":"SP"},{"name":"Assessoria Premium","reg_date":"2026-02-23","operator":"kauan.viana","creators_14":21,"rev_14":3027,"creators_30":65,"rev_30":128690,"profile":"Ex-Subagência","origem":"N/A","estado":"GO"},{"name":"Luxury.7k","reg_date":"2026-02-23","operator":"kauan.viana","creators_14":14,"rev_14":10276,"creators_30":15,"rev_30":32847,"profile":"Outro Negócio","origem":"N/A","estado":"MS"},{"name":"EVOX AGENCY","reg_date":"2026-02-23","operator":"kauan.viana","creators_14":16,"rev_14":99508,"creators_30":28,"rev_30":355743,"profile":"Outras Plataformas","origem":"N/A","estado":"GO"},{"name":"NextZ Stream","reg_date":"2026-02-25","operator":"kauan.viana","creators_14":2,"rev_14":0,"creators_30":2,"rev_30":0,"profile":"GFA (Presenteador)","origem":"N/A","estado":"SP"},{"name":"Modo On","reg_date":"2026-02-26","operator":"kauan.viana","creators_14":10,"rev_14":51364,"creators_30":45,"rev_30":221185,"profile":"Ex-Subagência","origem":"N/A","estado":"AM"},{"name":"Aurum Agency","reg_date":"2026-02-26","operator":"isabella.baroli","creators_14":7,"rev_14":6556,"creators_30":10,"rev_30":35403,"profile":"Ex-Subagência","origem":"N/A","estado":"MG"},{"name":"iGoal LIVES","reg_date":"2026-02-26","operator":"kauan.viana","creators_14":1,"rev_14":134,"creators_30":1,"rev_30":984,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"Tropa Viral","reg_date":"2026-03-01","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"N/A"},{"name":"Cerejytas Live Pro","reg_date":"2026-03-01","operator":"isabella.baroli","creators_14":10,"rev_14":15224,"creators_30":15,"rev_30":32310,"profile":"GFA (Presenteador)","origem":"Live/Backstage","estado":"N/A"},{"name":"Sunset Agency","reg_date":"2026-03-01","operator":"kauan.viana","creators_14":14,"rev_14":60055,"creators_30":27,"rev_30":149972,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"N/A"},{"name":"JM Elite Live","reg_date":"2026-03-01","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"N/A"},{"name":"ACID AGENCY","reg_date":"2026-03-01","operator":"kauan.viana","creators_14":12,"rev_14":8427,"creators_30":13,"rev_30":19272,"profile":"Outras Plataformas","origem":"N/A","estado":"RJ"},{"name":"Familia Leao de Juda","reg_date":"2026-03-01","operator":"isabella.baroli","creators_14":7,"rev_14":39749,"creators_30":9,"rev_30":67326,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"N/A"},{"name":"HYPE HUB AGENCY","reg_date":"2026-03-02","operator":"isabella.baroli","creators_14":6,"rev_14":25114,"creators_30":8,"rev_30":57525,"profile":"Streamer/CFA","origem":"N/A","estado":"GO"},{"name":"Casa dos Criadores","reg_date":"2026-03-02","operator":"kauan.viana","creators_14":27,"rev_14":190505,"creators_30":34,"rev_30":273388,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"N/A"},{"name":"HYPERNETWORKS","reg_date":"2026-03-02","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"TikTok Ads","estado":"N/A"},{"name":"BAZZI AGENCY","reg_date":"2026-03-04","operator":"kauan.viana","creators_14":6,"rev_14":21167,"creators_30":7,"rev_30":29699,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"MG"},{"name":"ENTRE_ Creators","reg_date":"2026-03-04","operator":"kauan.viana","creators_14":7,"rev_14":2026,"creators_30":31,"rev_30":21275,"profile":"Ex-Subagência","origem":"N/A","estado":"SP"},{"name":"Golden Flame","reg_date":"2026-03-04","operator":"kauan.viana","creators_14":2,"rev_14":77,"creators_30":2,"rev_30":77,"profile":"Outro Negócio","origem":"Live/Backstage","estado":"SP"},{"name":"Rios Influencers","reg_date":"2026-03-05","operator":"kauan.viana","creators_14":4,"rev_14":551,"creators_30":6,"rev_30":557,"profile":"Outras Plataformas","origem":"Live/Backstage","estado":"N/A"},{"name":"Imperio Creator","reg_date":"2026-03-05","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Sem Experiência","origem":"Live/Backstage","estado":"SP"},{"name":"Lua & sol agency","reg_date":"2026-03-05","operator":"isabella.baroli","creators_14":6,"rev_14":1159,"creators_30":6,"rev_30":1159,"profile":"Streamer/CFA","origem":"N/A","estado":"GO"},{"name":"ECMusic","reg_date":"2026-03-05","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"RS"},{"name":"LiveBoom","reg_date":"2026-03-06","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"GFA (Presenteador)","origem":"N/A","estado":"CE"},{"name":"Alienn","reg_date":"2026-03-08","operator":"isabella.baroli","creators_14":3,"rev_14":13658,"creators_30":6,"rev_30":29102,"profile":"GFA (Presenteador)","origem":"Live/Backstage","estado":"BA"},{"name":"The Majin Corp","reg_date":"2026-03-09","operator":"isabella.baroli","creators_14":3,"rev_14":1264,"creators_30":4,"rev_30":2788,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Believe Assessoria","reg_date":"2026-03-12","operator":"kauan.viana","creators_14":16,"rev_14":495,"creators_30":16,"rev_30":495,"profile":"Ex-Subagência","origem":"N/A","estado":"RJ"},{"name":"Osiris","reg_date":"2026-03-15","operator":"isabella.baroli","creators_14":18,"rev_14":42134,"creators_30":18,"rev_30":42134,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"FRIGE UP","reg_date":"2026-03-15","operator":"kauan.viana","creators_14":7,"rev_14":1361,"creators_30":7,"rev_30":1361,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"RUZZON","reg_date":"2026-03-15","operator":"isabella.baroli","creators_14":3,"rev_14":0,"creators_30":3,"rev_30":0,"profile":"Streamer/CFA","origem":"N/A","estado":"PR"},{"name":"Agencia gds","reg_date":"2026-03-16","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"N/A","estado":"PA"},{"name":"LDM Agency","reg_date":"2026-03-16","operator":"kauan.viana","creators_14":1,"rev_14":1864,"creators_30":1,"rev_30":1864,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"DHARA","reg_date":"2026-03-18","operator":"isabella.baroli","creators_14":8,"rev_14":6271,"creators_30":8,"rev_30":6271,"profile":"Streamer/CFA","origem":"Live/Backstage","estado":"N/A"},{"name":"Agencia Cactus Flow","reg_date":"2026-03-18","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Ex-Subagência","origem":"N/A","estado":"PE"},{"name":"Monetiza live","reg_date":"2026-03-19","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Streamer/CFA","origem":"N/A","estado":"PE"},{"name":"START NO STREAM","reg_date":"2026-03-19","operator":"kauan.viana","creators_14":9,"rev_14":1190,"creators_30":9,"rev_30":1190,"profile":"Streamer/CFA","origem":"N/A","estado":"RJ"},{"name":"Excelso","reg_date":"2026-03-19","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outro Negócio","origem":"N/A","estado":"MG"},{"name":"Papo Reto Tempestade","reg_date":"2026-03-19","operator":"kauan.viana","creators_14":6,"rev_14":22615,"creators_30":6,"rev_30":22615,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"Lunaire Agency","reg_date":"2026-03-19","operator":"kauan.viana","creators_14":9,"rev_14":954,"creators_30":9,"rev_30":954,"profile":"Streamer/CFA","origem":"N/A","estado":"PA"},{"name":"Agencia RAM","reg_date":"2026-03-20","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"N/A","estado":"MG"},{"name":"Little Agency","reg_date":"2026-03-20","operator":"kauan.viana","creators_14":9,"rev_14":14383,"creators_30":9,"rev_30":14383,"profile":"Streamer/CFA","origem":"N/A","estado":"N/A"},{"name":"Hember Agency","reg_date":"2026-03-20","operator":"kauan.viana","creators_14":8,"rev_14":10,"creators_30":8,"rev_30":10,"profile":"Streamer/CFA","origem":"N/A","estado":"SP"},{"name":"conecta agencia","reg_date":"2026-03-20","operator":"isabella.baroli","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"N/A","origem":"N/A","estado":"N/A"},{"name":"Ilumina Musical","reg_date":"2026-03-23","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"Outras Plataformas","origem":"N/A","estado":"SP"},{"name":"Connexao_on","reg_date":"2026-03-23","operator":"kauan.viana","creators_14":6,"rev_14":457,"creators_30":6,"rev_30":457,"profile":"Outras Plataformas","origem":"N/A","estado":"RJ"},{"name":"Lions League","reg_date":"2026-03-23","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"N/A","origem":"N/A","estado":"N/A"},{"name":"GTX Agencia","reg_date":"2026-03-24","operator":"kauan.viana","creators_14":0,"rev_14":0,"creators_30":0,"rev_30":0,"profile":"N/A","origem":"N/A","estado":"N/A"}];
+
+const TOTAL=DATA.length,CG=30,DG=100000,OP_GOAL=15;
+const metC=DATA.filter(d=>d.creators_30>=CG).length,metD=DATA.filter(d=>d.rev_30>=DG).length;
+const metBoth=DATA.filter(d=>d.creators_30>=CG&&d.rev_30>=DG).length;
+const totalC=DATA.reduce((s,d)=>s+d.creators_30,0),totalD=DATA.reduce((s,d)=>s+d.rev_30,0);
+const generating=DATA.filter(d=>d.rev_30>0).length,inactive=DATA.filter(d=>d.creators_30===0&&d.rev_30===0).length;
+const mC={};DATA.forEach(d=>{const m=d.reg_date.slice(0,7);mC[m]=(mC[m]||0)+1});
+const opD={};
+DATA.forEach(d=>{const k=d.operator;if(!opD[k])opD[k]={total:0,metBoth:0,creators:0,diamonds:0,metC:0,metD:0};opD[k].total++;opD[k].creators+=d.creators_30;opD[k].diamonds+=d.rev_30;if(d.creators_30>=CG)opD[k].metC++;if(d.rev_30>=DG)opD[k].metD++;if(d.creators_30>=CG&&d.rev_30>=DG)opD[k].metBoth++});
+const profC={},origC={},estC={};
+DATA.forEach(d=>{profC[d.profile]=(profC[d.profile]||0)+1;origC[d.origem]=(origC[d.origem]||0)+1;if(d.estado!=='N/A')estC[d.estado]=(estC[d.estado]||0)+1});
+function fmt(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':n.toString()}
+function fmtF(n){return n.toLocaleString('pt-BR')}
+function pct(n,t){return t?Math.round(n/t*100):0}
+function ring(v,t,c,s=120){const r=48,ci=2*Math.PI*r,p=t?v/t:0,o=ci*(1-p);return`<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}"><circle cx="${s/2}" cy="${s/2}" r="${r}" fill="none" stroke="var(--surface3)" stroke-width="8"/><circle cx="${s/2}" cy="${s/2}" r="${r}" fill="none" stroke="${c}" stroke-width="8" stroke-dasharray="${ci}" stroke-dashoffset="${o}" stroke-linecap="round" style="transition:stroke-dashoffset 1s ease"/></svg>`}
+function getStatus(d){if(d.creators_30>=CG&&d.rev_30>=DG)return{l:'D30 ✓',c:'graduated'};if(d.creators_30>=CG||d.rev_30>=DG)return{l:'Parcial',c:'partial'};if(d.creators_30>0||d.rev_30>0)return{l:'Ativa',c:'new'};return{l:'Inativa',c:'miss'}}
+function bw(v,m){return Math.min(100,m?v/m*100:0)}
+function bc(v,g){return v>=g?'var(--green)':v>=g*.5?'var(--amber)':'var(--red)'}
+const profColors={'Streamer/CFA':'#fe2c55','Ex-Subagência':'#25f4ee','Outras Plataformas':'#ff6b35','GFA (Presenteador)':'#a855f7','Sem Experiência':'#f59e0b','Outro Negócio':'#06b6d4','N/A':'#555570'};
+const opNames={'isabella.baroli':'Isabella Baroli','kauan.viana':'Kauan Viana'};
+const opColors={'isabella.baroli':'var(--accent)','kauan.viana':'var(--accent2)'};
+let sortCol='rev_30',sortDir=-1,filterTab='all',searchTerm='';
+
+function render(){
+  let f=[...DATA];
+  if(filterTab==='graduated')f=f.filter(d=>d.creators_30>=CG&&d.rev_30>=DG);
+  else if(filterTab==='partial')f=f.filter(d=>(d.creators_30>=CG||d.rev_30>=DG)&&!(d.creators_30>=CG&&d.rev_30>=DG));
+  else if(filterTab==='active')f=f.filter(d=>(d.creators_30>0||d.rev_30>0)&&d.creators_30<CG&&d.rev_30<DG);
+  else if(filterTab==='inactive')f=f.filter(d=>d.creators_30===0&&d.rev_30===0);
+  if(searchTerm)f=f.filter(d=>d.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  f.sort((a,b)=>{if(sortCol==='name'||sortCol==='operator'||sortCol==='reg_date'||sortCol==='profile'||sortCol==='origem')return(a[sortCol]||'').localeCompare(b[sortCol]||'')*sortDir;return((a[sortCol]||0)-(b[sortCol]||0))*sortDir});
+  const partialN=DATA.filter(d=>(d.creators_30>=CG||d.rev_30>=DG)&&!(d.creators_30>=CG&&d.rev_30>=DG)).length;
+  const activeN=DATA.filter(d=>(d.creators_30>0||d.rev_30>0)&&d.creators_30<CG&&d.rev_30<DG).length;
+
+  document.getElementById('app').innerHTML=`
+  <div class="header"><div class="header-left"><div class="logo">♪</div><div><h1>TikTok <span>LIVE</span> Brasil — BD Dashboard</h1><div class="subtitle">Q1 2026 · Acompanhamento de Onboarding de Agências</div></div></div><div class="badge"><span class="dot"></span>Atualizado · Março 2026</div></div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Agências Onboarded</div><div class="kpi-value" style="color:var(--accent)">${TOTAL}</div><div class="kpi-sub">Jan: ${mC['2026-01']||0} · Fev: ${mC['2026-02']||0} · Mar: ${mC['2026-03']||0}</div></div>
+    <div class="kpi"><div class="kpi-label">Total Criadores D30</div><div class="kpi-value" style="color:var(--accent2)">${fmt(totalC)}</div><div class="kpi-sub">Média ${(totalC/TOTAL).toFixed(1)} por agência</div></div>
+    <div class="kpi"><div class="kpi-label">Total Diamantes D30</div><div class="kpi-value">${fmt(totalD)}</div><div class="kpi-sub">${fmtF(totalD)} diamantes</div></div>
+    <div class="kpi"><div class="kpi-label">Gerando Receita</div><div class="kpi-value" style="color:var(--green)">${generating}</div><div class="kpi-sub">${pct(generating,TOTAL)}% do total · ${inactive} inativas</div></div>
+    <div class="kpi"><div class="kpi-label">D30 Graduation (ambas)</div><div class="kpi-value" style="color:var(--amber)">${metBoth}</div><div class="kpi-sub">${pct(metBoth,TOTAL)}% do total</div></div>
+  </div>
+
+  <div class="section"><div class="section-title">Metas D30 — Visão Geral</div></div>
+  <div class="goal-grid">
+    <div class="goal-card"><h4>≥30 Criadores</h4><div class="goal-ring">${ring(metC,TOTAL,'var(--accent2)')}<div class="value" style="color:var(--accent2)">${metC}</div></div><div style="font-size:13px;color:var(--text2)">${pct(metC,TOTAL)}% das agências</div></div>
+    <div class="goal-card"><h4>≥100K Diamantes</h4><div class="goal-ring">${ring(metD,TOTAL,'var(--accent)')}<div class="value" style="color:var(--accent)">${metD}</div></div><div style="font-size:13px;color:var(--text2)">${pct(metD,TOTAL)}% das agências</div></div>
+    <div class="goal-card"><h4>Ambas as Metas</h4><div class="goal-ring">${ring(metBoth,TOTAL,'var(--green)')}<div class="value" style="color:var(--green)">${metBoth}</div></div><div style="font-size:13px;color:var(--text2)">${pct(metBoth,TOTAL)}% das agências</div></div>
+  </div>
+
+  <div class="section"><div class="section-title">Performance por Operador — Meta: 15 agências graduadas</div></div>
+  <div class="operator-grid">
+    ${Object.entries(opD).map(([k,op])=>{const nm=opNames[k]||k;const pctGoal=Math.min(100,Math.round(op.metBoth/OP_GOAL*100));const goalColor=op.metBoth>=OP_GOAL?'var(--green)':op.metBoth>=10?'var(--amber)':'var(--accent)';return`
+    <div class="op-card">
+      <div class="op-header">
+        <div class="avatar" style="background:${opColors[k]||'var(--accent4)'}">${nm.charAt(0)}</div>
+        <div><div class="op-name">${nm}</div><div class="op-role">Business Development · ${op.total} agências</div></div>
+      </div>
+      <div class="op-stats">
+        <div class="op-stat"><div class="val" style="color:var(--accent2)">${fmt(op.creators)}</div><div class="lbl">Criadores</div></div>
+        <div class="op-stat"><div class="val" style="color:var(--accent)">${fmt(op.diamonds)}</div><div class="lbl">Diamantes</div></div>
+        <div class="op-stat"><div class="val" style="color:var(--green)">${pct(op.metBoth,op.total)}%</div><div class="lbl">Taxa D30</div></div>
+      </div>
+      <div class="op-goal">
+        <div class="op-goal-header">
+          <div class="op-goal-label">D30 Graduation Goal</div>
+          <div class="op-goal-value" style="color:${goalColor}">${op.metBoth} / ${OP_GOAL}</div>
+        </div>
+        <div class="op-goal-bar"><div class="fill" style="width:${pctGoal}%;background:${goalColor}"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text3)">
+          <span>≥30 criadores: ${op.metC}</span>
+          <span>≥100K diamantes: ${op.metD}</span>
+        </div>
+      </div>
+    </div>`}).join('')}
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card"><h3>Onboarding por Mês</h3><canvas id="cMonth" height="220"></canvas></div>
+    <div class="chart-card"><h3>Top 15 — Diamantes D30</h3><canvas id="cRev" height="220"></canvas></div>
+  </div>
+  <div class="charts-row-3">
+    <div class="chart-card"><h3>Perfil das Agências</h3><canvas id="cProf" height="240"></canvas></div>
+    <div class="chart-card"><h3>Origem / Canal de Aquisição</h3><canvas id="cOrig" height="240"></canvas></div>
+    <div class="chart-card"><h3>Top Estados</h3><canvas id="cEst" height="240"></canvas></div>
+  </div>
+
+  <div class="section"><div class="section-title">Todas as Agências — Detalhamento</div></div>
+  <div class="table-wrap">
+    <div class="table-controls">
+      <button class="tab ${filterTab==='all'?'active':''}" onclick="setF('all')">Todas (${TOTAL})</button>
+      <button class="tab ${filterTab==='graduated'?'active':''}" onclick="setF('graduated')">D30 ✓ (${metBoth})</button>
+      <button class="tab ${filterTab==='partial'?'active':''}" onclick="setF('partial')">Parcial (${partialN})</button>
+      <button class="tab ${filterTab==='active'?'active':''}" onclick="setF('active')">Ativas (${activeN})</button>
+      <button class="tab ${filterTab==='inactive'?'active':''}" onclick="setF('inactive')">Inativas (${inactive})</button>
+      <input class="search-box" placeholder="Buscar agência..." value="${searchTerm}" oninput="setS(this.value)">
+    </div>
+    <div class="table-scroll">
+      <table><thead><tr>
+        <th onclick="srt('name')">Agência ${sortCol==='name'?sortDir===1?'↑':'↓':''}</th>
+        <th onclick="srt('reg_date')">Data ${sortCol==='reg_date'?sortDir===1?'↑':'↓':''}</th>
+        <th onclick="srt('operator')">Operador</th>
+        <th onclick="srt('profile')">Perfil</th>
+        <th onclick="srt('origem')">Origem</th>
+        <th onclick="srt('estado')">UF</th>
+        <th onclick="srt('creators_30')">Cri. D30 ${sortCol==='creators_30'?sortDir===1?'↑':'↓':''}</th>
+        <th>Meta 30</th>
+        <th onclick="srt('rev_30')">Diam. D30 ${sortCol==='rev_30'?sortDir===1?'↑':'↓':''}</th>
+        <th>Meta 100K</th>
+        <th>Status</th>
+      </tr></thead><tbody>
+        ${f.map(d=>{const st=getStatus(d);const pc=profColors[d.profile]||'#555';return`<tr>
+          <td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis">${d.name}</td>
+          <td style="color:var(--text2);font-family:'Space Mono',monospace;font-size:11px">${d.reg_date.slice(5)}</td>
+          <td style="font-size:12px">${(opNames[d.operator]||d.operator).split(' ')[0]}</td>
+          <td><span class="profile-tag" style="background:${pc}22;color:${pc}">${d.profile}</span></td>
+          <td style="font-size:11px;color:var(--text2)">${d.origem==='N/A'?'—':d.origem}</td>
+          <td style="font-size:11px;color:var(--text2)">${d.estado==='N/A'?'—':d.estado}</td>
+          <td style="font-weight:600;${d.creators_30>=CG?'color:var(--green)':''}">${d.creators_30}</td>
+          <td><div class="bar-mini"><div class="fill" style="width:${bw(d.creators_30,CG)}%;background:${bc(d.creators_30,CG)}"></div></div></td>
+          <td style="font-weight:600;${d.rev_30>=DG?'color:var(--green)':''}">${fmtF(d.rev_30)}</td>
+          <td><div class="bar-mini"><div class="fill" style="width:${bw(d.rev_30,DG)}%;background:${bc(d.rev_30,DG)}"></div></div></td>
+          <td><span class="status-pill ${st.c}">${st.l}</span></td>
+        </tr>`}).join('')}
+      </tbody></table>
+    </div>
+  </div>
+  <div style="text-align:center;padding:40px 0;color:var(--text3);font-size:12px;font-family:'Space Mono',monospace">TikTok LIVE Brasil · Business Development · Q1 2026</div>`;
+  renderCharts();
+}
+
+function setF(v){filterTab=v;render()}
+function setS(v){searchTerm=v;render()}
+function srt(c){if(sortCol===c)sortDir*=-1;else{sortCol=c;sortDir=['name','reg_date','operator','profile','origem','estado'].includes(c)?1:-1}render()}
+
+function renderCharts(){
+  const fc='#8888a0',gc='#2a2a3e';
+  const def={plugins:{legend:{display:false}},scales:{x:{ticks:{color:fc,font:{size:11}},grid:{color:'transparent'}},y:{ticks:{color:fc,font:{size:11}},grid:{color:gc}}}};
+
+  new Chart(document.getElementById('cMonth'),{type:'bar',data:{labels:['Janeiro','Fevereiro','Março'],datasets:[{data:[mC['2026-01']||0,mC['2026-02']||0,mC['2026-03']||0],backgroundColor:['#fe2c55','#25f4ee','#fffc00'],borderRadius:8,barPercentage:.5}]},options:{...def,scales:{...def.scales,y:{...def.scales.y,beginAtZero:true}}}});
+
+  const tr=[...DATA].sort((a,b)=>b.rev_30-a.rev_30).slice(0,15);
+  new Chart(document.getElementById('cRev'),{type:'bar',data:{labels:tr.map(d=>d.name.length>20?d.name.slice(0,20)+'…':d.name),datasets:[{data:tr.map(d=>d.rev_30),backgroundColor:tr.map(d=>d.rev_30>=DG?'#22c55e88':'#fe2c5566'),borderRadius:4,barPercentage:.6}]},options:{indexAxis:'y',...def,scales:{x:{ticks:{color:fc,font:{size:10},callback:v=>fmt(v)},grid:{color:gc}},y:{ticks:{color:fc,font:{size:10}},grid:{color:'transparent'}}}}});
+
+  // Profile donut
+  const profEntries=Object.entries(profC).sort((a,b)=>b[1]-a[1]);
+  new Chart(document.getElementById('cProf'),{type:'doughnut',data:{labels:profEntries.map(e=>e[0]),datasets:[{data:profEntries.map(e=>e[1]),backgroundColor:profEntries.map(e=>profColors[e[0]]||'#555'),borderWidth:0}]},options:{plugins:{legend:{display:true,position:'bottom',labels:{color:fc,font:{size:10},padding:8,boxWidth:12}}},cutout:'65%'}});
+
+  // Origin donut
+  const origEntries=Object.entries(origC).sort((a,b)=>b[1]-a[1]);
+  const origColors=['#fe2c55','#25f4ee','#fffc00','#ff6b35','#a855f7','#555570'];
+  new Chart(document.getElementById('cOrig'),{type:'doughnut',data:{labels:origEntries.map(e=>e[0]),datasets:[{data:origEntries.map(e=>e[1]),backgroundColor:origColors.slice(0,origEntries.length),borderWidth:0}]},options:{plugins:{legend:{display:true,position:'bottom',labels:{color:fc,font:{size:10},padding:8,boxWidth:12}}},cutout:'65%'}});
+
+  // State bar
+  const estEntries=Object.entries(estC).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  new Chart(document.getElementById('cEst'),{type:'bar',data:{labels:estEntries.map(e=>e[0]),datasets:[{data:estEntries.map(e=>e[1]),backgroundColor:'#25f4ee88',borderRadius:4,barPercentage:.5}]},options:{...def,scales:{...def.scales,y:{...def.scales.y,beginAtZero:true}}}});
+}
+render();
+</script>
+</body>
+</html>
